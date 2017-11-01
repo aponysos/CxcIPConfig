@@ -81,7 +81,8 @@ namespace log4cpp {
         CategoryStream& operator<<(const T& t) {
             if (getPriority() != Priority::NOTSET) {
                 if (!_buffer) {
-					if (!(_buffer = new std::ostringstream)) {
+                  _buffer = new std::ostringstream;
+                  if (!_buffer) {
                         // XXX help help help
                     }
                 }
@@ -96,7 +97,8 @@ namespace log4cpp {
  	     CategoryStream& operator<<(const std::string& t) {
             if (getPriority() != Priority::NOTSET) {
                 if (!_buffer) {
-                    if (!(_buffer = new std::ostringstream)) {
+                  _buffer = new std::ostringstream;
+                  if (!_buffer) {
                         // XXX help help help
                     }
                 }
@@ -109,7 +111,8 @@ namespace log4cpp {
         CategoryStream& operator<<(const std::wstring& t) {
             if (getPriority() != Priority::NOTSET) {
                 if (!_wbuffer) {
-                    if (!(_wbuffer = new std::wostringstream)) {
+                  _wbuffer = new std::ostringstream;
+                  if (!_wbuffer) {
                         // XXX help help help
                     }
                 }

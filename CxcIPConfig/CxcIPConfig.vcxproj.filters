@@ -22,9 +22,6 @@
     <ClInclude Include="..\src\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\log4cpp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\CxcIPConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>

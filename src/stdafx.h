@@ -1,4 +1,4 @@
 #pragma once
 
-#include "log4cpp\Category.hh"
-#include "log4cpp\FileAppender.hh"
+// log4cpp headers
+#include "log4cpp\log4cpp.h"
