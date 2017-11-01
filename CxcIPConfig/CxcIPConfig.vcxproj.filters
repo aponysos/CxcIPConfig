@@ -14,7 +14,7 @@
     <ClCompile Include="..\src\stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CxcIPConfig.cpp">
+    <ClCompile Include="..\src\CxcIPConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -22,7 +22,10 @@
     <ClInclude Include="..\src\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CxcIPConfig.h">
+    <ClInclude Include="..\src\log4cpp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CxcIPConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
