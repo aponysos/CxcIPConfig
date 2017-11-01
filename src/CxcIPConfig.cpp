@@ -25,10 +25,15 @@ void init_log()
   INFO_LOG() << "log file: " << LOG_FILE << ", priority: " << LOG_PRIORITY;
 }
 
-int main()
+int main(int argc, char ** argv)
 {
   init_log();
   INFO_LOG() << "CxcIPConfig program begin";
-  INFO_LOG() << "CxcIPConfig program end";
-  return 0;
+
+  QApplication app(argc, argv);
+
+  QLabel *label = new QLabel("Hello, world");
+  label->show();
+
+  return app.exec();
 }
