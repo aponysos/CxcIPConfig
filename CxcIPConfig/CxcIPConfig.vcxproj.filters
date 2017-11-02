@@ -17,12 +17,18 @@
     <ClCompile Include="..\src\CxcIPConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\IphlpApiWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\CxcIPConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\IphlpApiWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
