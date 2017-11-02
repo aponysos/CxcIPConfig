@@ -4,3 +4,4 @@
 #include "log4cpp\log4cpp.h"
 #include "QtWidgets\qapplication.h"
 #include "QtWidgets\qlabel.h"
+#include <iphlpapi.h>
