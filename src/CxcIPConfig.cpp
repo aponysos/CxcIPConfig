@@ -100,6 +100,12 @@ void GetAllAdaptorInfo2(std::vector<IPAdapterInfo>& adptInfos)
       throw RegError("RegOpenKeyEx", status);
     }
     INFO_LOG() << "RegOpenKeyEx: ERROR_SUCCESS";
+
+    DWORD len = 255;
+    BYTE lpData[255];
+    ::RegQueryValueEx(hkeyInterface, "LowerRange", NULL, NULL, lpData, &len);
+    info.type.assign((LPTSTR)lpData);
+    INFO_LOG() << "type: " << info.type;
     ::RegCloseKey(hkeyInterface);
   }
 }
