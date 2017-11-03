@@ -261,5 +261,5 @@ __pycache__/
 *.pyc
 
 # except: 3rd party libraries
-!/lib
+!/lib/
 sync_log4cpp.bat
