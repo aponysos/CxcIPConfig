@@ -116,15 +116,17 @@ void GetAllAdaptorInfo3(std::vector<IPAdapterInfo> & adptInfos)
 {
   LSTATUS status = ERROR_SUCCESS;
   for (auto info : adptInfos) {
-    if (info.type != "ethernet")
+    if (info.type.find("ethernet", 0) == std::string::npos) {
+      INFO_LOG() << info.type << " ignored";
       continue;
+    }
     std::ostringstream oss;
     oss << "SYSTEM\\CurrentControlSet\\services\\Tcpip\\Parameters\\Interfaces\\"
       << info.name;
     DEBUG_LOG() << oss.str();
     HKEY hkeyInterface;
     status = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-      oss.str().c_str(), 0, KEY_ALL_ACCESS, &hkeyInterface);
+      oss.str().c_str(), 0, KEY_READ, &hkeyInterface);
     if (ERROR_SUCCESS != status) {
       ::RegCloseKey(hkeyInterface);
       ERROR_LOG() << "RegOpenKeyEx: " << status;
@@ -133,15 +135,25 @@ void GetAllAdaptorInfo3(std::vector<IPAdapterInfo> & adptInfos)
 
     DWORD len = 255;
     BYTE lpData[255];
-    ::RegQueryValueEx(hkeyInterface, "IPAddress", NULL, NULL, lpData, &len);
-    info.ipAddr.assign((LPTSTR)lpData);
+    status = ::RegQueryValueEx(hkeyInterface, "IPAddress", NULL, NULL, lpData, &len);
+    if (ERROR_SUCCESS != status)
+      ERROR_LOG() << "RegQueryValueEx: " << status;
+    else
+      info.ipAddr.assign((LPTSTR)lpData);
     INFO_LOG() << "ipAddr: " << info.ipAddr;
-    ::RegQueryValueEx(hkeyInterface, "SubnetMask", NULL, NULL, lpData, &len);
-    info.ipMask.assign((LPTSTR)lpData);
+    status = ::RegQueryValueEx(hkeyInterface, "SubnetMask", NULL, NULL, lpData, &len);
+    if (ERROR_SUCCESS != status)
+      ERROR_LOG() << "RegQueryValueEx: " << status;
+    else
+      info.ipMask.assign((LPTSTR)lpData);
     INFO_LOG() << "ipMask: " << info.ipMask;
-    ::RegQueryValueEx(hkeyInterface, "DefaultGateway", NULL, NULL, lpData, &len);
-    info.ipGate.assign((LPTSTR)lpData);
+    status = ::RegQueryValueEx(hkeyInterface, "DefaultGateway", NULL, NULL, lpData, &len);
+    if (ERROR_SUCCESS != status)
+      ERROR_LOG() << "RegQueryValueEx: " << status;
+    else
+      info.ipGate.assign((LPTSTR)lpData);
     INFO_LOG() << "ipGate: " << info.ipGate;
+
     ::RegCloseKey(hkeyInterface);
   }
 }
