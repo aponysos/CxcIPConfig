@@ -2,7 +2,7 @@
 #include "CxcIPConfig.h"
 #include "IphlpApiWrapper.h"
 
-#define PATTERN_STRING  "%d [%5p]{%5t} %m%n"
+#define PATTERN_STRING  "%d [%5p](%5t) %m%n"
 #define LOG_FILE        "CxcIPConfig.log"
 #define LOG_PRIORITY    (log4cpp::Priority::DEBUG)
 
@@ -13,6 +13,7 @@ int main(int /*argc*/, char ** /*argv*/)
   std::vector<IPAdapterInfo> adptInfos;
   GetAllAdaptorInfo(adptInfos);
   GetAllAdaptorInfo2(adptInfos);
+  GetAllAdaptorInfo3(adptInfos);
 
   INFO_LOG() << "CxcIPConfig program end\n";
   return 0;
@@ -79,17 +80,18 @@ void GetAllAdaptorInfo(std::vector<IPAdapterInfo> & adptInfos)
   } // end of for pAdapter
 }
 
-void GetAllAdaptorInfo2(std::vector<IPAdapterInfo>& adptInfos)
+void GetAllAdaptorInfo2(std::vector<IPAdapterInfo> & adptInfos)
 {
   LSTATUS status = ERROR_SUCCESS;
-  for (auto info : adptInfos) {
-    HKEY hkeyInterface;
+  for (int i = 0; i < adptInfos.size(); ++i) {
+    IPAdapterInfo & info = adptInfos[i];
     std::ostringstream oss;
     oss << "SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002BE10318}\\" 
       << std::setw(4) << std::setfill('0') << info.index << "\\Ndi\\Interfaces";
-    INFO_LOG() << oss.str();
+    DEBUG_LOG() << oss.str();
+    HKEY hkeyInterface;
     status = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-      oss.str().c_str(), 0, KEY_ALL_ACCESS, &hkeyInterface);
+      oss.str().c_str(), 0, KEY_READ, &hkeyInterface);
     if (ERROR_SUCCESS != status) {
       ::RegCloseKey(hkeyInterface);
       if (ERROR_FILE_NOT_FOUND == status) {
@@ -99,13 +101,47 @@ void GetAllAdaptorInfo2(std::vector<IPAdapterInfo>& adptInfos)
       ERROR_LOG() << "RegOpenKeyEx: " << status;
       throw RegError("RegOpenKeyEx", status);
     }
-    INFO_LOG() << "RegOpenKeyEx: ERROR_SUCCESS";
+    DEBUG_LOG() << "RegOpenKeyEx: ERROR_SUCCESS";
 
     DWORD len = 255;
     BYTE lpData[255];
     ::RegQueryValueEx(hkeyInterface, "LowerRange", NULL, NULL, lpData, &len);
     info.type.assign((LPTSTR)lpData);
     INFO_LOG() << "type: " << info.type;
+    ::RegCloseKey(hkeyInterface);
+  }
+}
+
+void GetAllAdaptorInfo3(std::vector<IPAdapterInfo> & adptInfos)
+{
+  LSTATUS status = ERROR_SUCCESS;
+  for (auto info : adptInfos) {
+    if (info.type != "ethernet")
+      continue;
+    std::ostringstream oss;
+    oss << "SYSTEM\\CurrentControlSet\\services\\Tcpip\\Parameters\\Interfaces\\"
+      << info.name;
+    DEBUG_LOG() << oss.str();
+    HKEY hkeyInterface;
+    status = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+      oss.str().c_str(), 0, KEY_ALL_ACCESS, &hkeyInterface);
+    if (ERROR_SUCCESS != status) {
+      ::RegCloseKey(hkeyInterface);
+      ERROR_LOG() << "RegOpenKeyEx: " << status;
+      continue;
+    }
+
+    DWORD len = 255;
+    BYTE lpData[255];
+    ::RegQueryValueEx(hkeyInterface, "IPAddress", NULL, NULL, lpData, &len);
+    info.ipAddr.assign((LPTSTR)lpData);
+    INFO_LOG() << "ipAddr: " << info.ipAddr;
+    ::RegQueryValueEx(hkeyInterface, "SubnetMask", NULL, NULL, lpData, &len);
+    info.ipMask.assign((LPTSTR)lpData);
+    INFO_LOG() << "ipMask: " << info.ipMask;
+    ::RegQueryValueEx(hkeyInterface, "DefaultGateway", NULL, NULL, lpData, &len);
+    info.ipGate.assign((LPTSTR)lpData);
+    INFO_LOG() << "ipGate: " << info.ipGate;
     ::RegCloseKey(hkeyInterface);
   }
 }
