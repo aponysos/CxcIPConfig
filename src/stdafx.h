@@ -5,6 +5,8 @@
 #include <vector>
 #include <stdexcept>
 #include <memory>
+#include <iomanip>
+#include <sstream>
 #include <WinSock2.h>
 #include <iphlpapi.h>
 
