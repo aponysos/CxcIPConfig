@@ -9,18 +9,11 @@
 int main(int /*argc*/, char ** /*argv*/)
 {
   init_log();
-  INFO_LOG() << "CxcIPConfig program begin";
 
-  init_net();
+  std::vector<IPAdapterInfo> adptInfos;
+  GetAllAdaptorInfo(adptInfos);
 
-  //QApplication app(argc, argv);
-
-  //QLabel *label = new QLabel("Hello, world");
-  //label->show();
-
-  //return app.exec();
-  INFO_LOG() << "CxcIPConfig program end";
-  INFO_LOG() << "------------------------------------------------------------\n";
+  INFO_LOG() << "CxcIPConfig program end\n";
   return 0;
 }
 
@@ -32,15 +25,12 @@ void init_log()
   layout->setConversionPattern(PATTERN_STRING);
   appender->setLayout(layout);
 
-  log4cpp::Appender * appender1 = new log4cpp::OstreamAppender(
-    "console", &std::cout);
-  appender1->setLayout(new log4cpp::BasicLayout());
-
   log4cpp::Category & root = log4cpp::Category::getRoot();
   root.setPriority(LOG_PRIORITY);
   root.addAppender(appender);
-  root.addAppender(appender1);
 
   INFO_LOG() << "------------------------------------------------------------";
+  INFO_LOG() << "CxcIPConfig program begin";
   INFO_LOG() << "log file: " << LOG_FILE << ", priority: " << LOG_PRIORITY;
+  INFO_LOG() << "------------------------------------------------------------";
 }

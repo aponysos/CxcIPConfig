@@ -1,7 +1,5 @@
 #pragma once
 
-void init_net();
-
 struct IPAdapterInfo
 {
   std::string name; // GUID
