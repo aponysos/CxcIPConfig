@@ -19,12 +19,15 @@ struct IPAdapterInfo
 class WindowsAPIError : public std::runtime_error
 {
 public:
-  WindowsAPIError(const std::string & apiName, long errCode);
+  WindowsAPIError(long errCode, const std::string & apiName, const std::string & params = "");
   virtual const char * what();
+  long GetErrorCode() { return errCode_; }
 
 private:
   std::string apiName_;
+  std::string params_;
   long errCode_;
+  std::string msg_;
 };
 
 template<class T>
@@ -42,12 +45,19 @@ void GetAllAdaptorInfo3(std::vector<IPAdapterInfo> & adptInfos);
 class HKEYWrapper
 {
 public:
+  enum AccessRights { Read, ReadWrite };
+
+public:
   HKEYWrapper(HKEY hkey = NULL);
   ~HKEYWrapper();
 
   HKEY GetHKEY() {
     return hkey_;
   }
+
+  long Open(HKEY root, const std::string & sub, bool needWrite);
+  void Close();
+  long Query(const std::string & value, std::string & data);
 
 private:
   HKEY hkey_;
