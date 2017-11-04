@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "CxcIPConfig.h"
-#include "IphlpApiWrapper.h"
+
+using namespace CxcIPConfig;
 
 int main(int /*argc*/, char ** /*argv*/)
 {
@@ -20,7 +21,10 @@ int main(int /*argc*/, char ** /*argv*/)
   return 0;
 }
 
-void init_log()
+namespace CxcIPConfig
+{
+
+  void init_log()
 {
   const char * PATTERN_STRING = "%d [%5p](%5t) %m%n";
   const char * LOG_FILE = "CxcIPConfig.log";
@@ -183,3 +187,5 @@ HKEYWrapper::~HKEYWrapper()
 {
   ::RegCloseKey(hkey_);
 }
+
+} // namespace CxcIPConfig

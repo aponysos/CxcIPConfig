@@ -1,5 +1,8 @@
 #pragma once
 
+namespace CxcIPConfig
+{
+
 void init_log();
 
 struct IPAdapterInfo
@@ -49,3 +52,5 @@ public:
 private:
   HKEY hkey_;
 };
+
+} // namespace CxcIPConfig
