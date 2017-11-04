@@ -13,16 +13,39 @@ struct IPAdapterInfo
   std::string ipGate; // ip gateway
 };
 
-class RegError : public std::runtime_error
+class WindowsAPIError : public std::runtime_error
 {
 public:
-  RegError(const std::string & api, LSTATUS status);
+  WindowsAPIError(const std::string & apiName, long errCode);
+  virtual const char * what();
 
 private:
-  std::string api_;
-  LSTATUS status_;
+  std::string apiName_;
+  long errCode_;
 };
+
+template<class T>
+inline std::string ToString(const T & val)
+{
+  std::ostringstream oss;
+  oss << val;
+  return oss.str();
+}
 
 void GetAllAdaptorInfo(std::vector<IPAdapterInfo> & adptInfos);
 void GetAllAdaptorInfo2(std::vector<IPAdapterInfo> & adptInfos);
 void GetAllAdaptorInfo3(std::vector<IPAdapterInfo> & adptInfos);
+
+class HKEYWrapper
+{
+public:
+  HKEYWrapper(HKEY hkey = NULL);
+  ~HKEYWrapper();
+
+  HKEY GetHKEY() {
+    return hkey_;
+  }
+
+private:
+  HKEY hkey_;
+};

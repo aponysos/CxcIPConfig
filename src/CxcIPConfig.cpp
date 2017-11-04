@@ -2,18 +2,19 @@
 #include "CxcIPConfig.h"
 #include "IphlpApiWrapper.h"
 
-#define PATTERN_STRING  "%d [%5p](%5t) %m%n"
-#define LOG_FILE        "CxcIPConfig.log"
-#define LOG_PRIORITY    (log4cpp::Priority::DEBUG)
-
 int main(int /*argc*/, char ** /*argv*/)
 {
   init_log();
 
   std::vector<IPAdapterInfo> adptInfos;
-  GetAllAdaptorInfo(adptInfos);
-  GetAllAdaptorInfo2(adptInfos);
-  GetAllAdaptorInfo3(adptInfos);
+  try {
+    GetAllAdaptorInfo(adptInfos);
+    GetAllAdaptorInfo2(adptInfos);
+    GetAllAdaptorInfo3(adptInfos);
+  }
+  catch (WindowsAPIError & e) {
+    ERROR_LOG() << e.what();
+  }
 
   INFO_LOG() << "CxcIPConfig program end\n";
   return 0;
@@ -21,10 +22,15 @@ int main(int /*argc*/, char ** /*argv*/)
 
 void init_log()
 {
-  log4cpp::Appender * appender = new log4cpp::FileAppender(
-    "file", LOG_FILE);
+  const char * PATTERN_STRING = "%d [%5p](%5t) %m%n";
+  const char * LOG_FILE = "CxcIPConfig.log";
+  const int LOG_PRIORITY = log4cpp::Priority::DEBUG;
+
   log4cpp::PatternLayout * layout = new log4cpp::PatternLayout();
   layout->setConversionPattern(PATTERN_STRING);
+
+  log4cpp::Appender * appender = new log4cpp::FileAppender(
+    "file", LOG_FILE);
   appender->setLayout(layout);
 
   log4cpp::Category & root = log4cpp::Category::getRoot();
@@ -37,9 +43,26 @@ void init_log()
   INFO_LOG() << "------------------------------------------------------------";
 }
 
-RegError::RegError(const std::string & api, LSTATUS status)
-  : std::runtime_error(api), api_(api), status_(status)
+WindowsAPIError::WindowsAPIError(const std::string & apiName, long errCode)
+  : std::runtime_error(""), apiName_(apiName), errCode_(errCode)
 {
+}
+
+const char * WindowsAPIError::what()
+{
+  std::string msg;
+  msg.append(apiName_).append(" : ");
+  //LPTSTR lpMsgBuf;
+  //DWORD ret = ::FormatMessage(
+  //  FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+  //  FORMAT_MESSAGE_FROM_SYSTEM | 
+  //  FORMAT_MESSAGE_IGNORE_INSERTS, 
+  //  NULL, errCode_, 0, //Default language
+  //  lpMsgBuf, 0, NULL);
+  msg.append("(");
+  msg.append(ToString(errCode_));
+  msg.append(")");
+  return msg.c_str();
 }
 
 void GetAllAdaptorInfo(std::vector<IPAdapterInfo> & adptInfos)
@@ -49,20 +72,16 @@ void GetAllAdaptorInfo(std::vector<IPAdapterInfo> & adptInfos)
   IP_ADAPTER_INFO probe;
   ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
   err = ::GetAdaptersInfo(&probe, &ulOutBufLen);
-  if (ERROR_BUFFER_OVERFLOW != err) {
-    ERROR_LOG() << "GetAdaptersInfo(initial): " << err;
-    throw std::runtime_error("");
-  }
+  if (ERROR_BUFFER_OVERFLOW != err)
+    throw WindowsAPIError("GetAdaptersInfo(probe)", err);
 
   size_t nNeeded = ulOutBufLen / sizeof(IP_ADAPTER_INFO);
-  INFO_LOG() << "GetAdaptersInfo nNeeded: " << nNeeded;
+  INFO_LOG() << nNeeded << " IP_ADAPTER_INFO needed";
 
   std::unique_ptr<IP_ADAPTER_INFO[]> infos(new IP_ADAPTER_INFO[nNeeded]);
   err = ::GetAdaptersInfo(infos.get(), &ulOutBufLen);
-  if (ERROR_SUCCESS != err) {
-    ERROR_LOG() << "GetAdaptersInfo: " << err;
-    throw std::runtime_error("");
-  }
+  if (ERROR_SUCCESS != err)
+    throw WindowsAPIError("GetAdaptersInfo", err);
 
   for (PIP_ADAPTER_INFO pAdapter = infos.get();
     pAdapter; pAdapter = pAdapter->Next) {
@@ -70,9 +89,6 @@ void GetAllAdaptorInfo(std::vector<IPAdapterInfo> & adptInfos)
     info.name = pAdapter->AdapterName;
     info.desc = pAdapter->Description;
     info.index = pAdapter->Index;
-    info.ipAddr = pAdapter->IpAddressList.IpAddress.String;
-    info.ipMask = pAdapter->IpAddressList.IpMask.String;
-    info.ipGate = pAdapter->GatewayList.IpAddress.String;
     INFO_LOG() << "AdapterName: " << info.name;
     INFO_LOG() << "Description: " << info.desc;
     INFO_LOG() << "Index: " << info.index;
@@ -99,7 +115,7 @@ void GetAllAdaptorInfo2(std::vector<IPAdapterInfo> & adptInfos)
         continue;
       }
       ERROR_LOG() << "RegOpenKeyEx: " << status;
-      throw RegError("RegOpenKeyEx", status);
+      throw WindowsAPIError("RegOpenKeyEx", status);
     }
     DEBUG_LOG() << "RegOpenKeyEx: ERROR_SUCCESS";
 
@@ -156,4 +172,14 @@ void GetAllAdaptorInfo3(std::vector<IPAdapterInfo> & adptInfos)
 
     ::RegCloseKey(hkeyInterface);
   }
+}
+
+HKEYWrapper::HKEYWrapper(HKEY hkey)
+  : hkey_(hkey)
+{
+}
+
+HKEYWrapper::~HKEYWrapper()
+{
+  ::RegCloseKey(hkey_);
 }
