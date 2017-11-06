@@ -39,7 +39,7 @@ void GetAllAdaptorInfo(std::vector<IPAdapterInfo> & adptInfos)
     throw WindowsAPIError(err, "GetAdaptersInfo(probe)");
 
   size_t nNeeded = ulOutBufLen / sizeof(IP_ADAPTER_INFO);
-  INFO_LOG() << nNeeded << " IP_ADAPTER_INFO needed";
+  INFO_LOG() << "GetAdaptersInfo(probe): " << nNeeded << " IP_ADAPTER_INFO needed";
   std::unique_ptr<IP_ADAPTER_INFO[]> infos(new IP_ADAPTER_INFO[nNeeded]);
   
   err = ::GetAdaptersInfo(infos.get(), &ulOutBufLen);
@@ -52,9 +52,7 @@ void GetAllAdaptorInfo(std::vector<IPAdapterInfo> & adptInfos)
     info.name = pAdapter->AdapterName;
     info.desc = pAdapter->Description;
     info.index = pAdapter->Index;
-    INFO_LOG() << "AdapterName: " << info.name;
-    INFO_LOG() << "Description: " << info.desc;
-    INFO_LOG() << "Index: " << info.index;
+    INFO_LOG() << info.name << "|" << info.desc << "|" << info.index;
     
     adptInfos.push_back(info);
   } // end of for pAdapter
@@ -76,12 +74,9 @@ void GetAllAdaptorInfo2(std::vector<IPAdapterInfo> & adptInfos)
     try {
       status = hkeyInterface.Open(HKEY_LOCAL_MACHINE, oss.str(), false);
     }
-    catch (WindowsAPIError & e) {
-      if (ERROR_FILE_NOT_FOUND == e.GetErrorCode()) {
-        WARN_LOG() << e.what();
-        continue;
-      }
-      else throw;
+    catch (FileNotFoundError & e) {
+      WARN_LOG() << e.what();
+      continue;
     }
 
     hkeyInterface.Query("LowerRange", info.type);
@@ -106,12 +101,9 @@ void GetAllAdaptorInfo3(std::vector<IPAdapterInfo> & adptInfos)
     try {
       hkeyInterface.Open(HKEY_LOCAL_MACHINE, oss.str(), false);
     }
-    catch (WindowsAPIError & e) {
-      if (ERROR_FILE_NOT_FOUND == e.GetErrorCode()) {
-        WARN_LOG() << e.what();
-        continue;
-      }
-      else throw;
+    catch (FileNotFoundError & e) {
+      WARN_LOG() << e.what();
+      continue;
     }
 
     try {
@@ -119,12 +111,9 @@ void GetAllAdaptorInfo3(std::vector<IPAdapterInfo> & adptInfos)
       hkeyInterface.Query("SubnetMask", info.ipMask);
       hkeyInterface.Query("DefaultGateway", info.ipGate);
     }
-    catch (WindowsAPIError & e) {
-      if (ERROR_FILE_NOT_FOUND == e.GetErrorCode()) {
-        WARN_LOG() << e.what();
-        continue;
-      }
-      else throw;
+    catch (FileNotFoundError & e) {
+      WARN_LOG() << e.what();
+      continue;
     }
   }
 }

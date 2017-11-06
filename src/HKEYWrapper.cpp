@@ -23,10 +23,17 @@ long HKEYWrapper::Open(HKEY root, const std::string & sub, bool needWrite)
 
   LRESULT status = ::RegOpenKeyEx(root, sub.c_str(), 0,
     needWrite ? KEY_WRITE : KEY_READ, &hkey_);
-  if (ERROR_SUCCESS != status)
+  switch (status)
+  {
+  case ERROR_SUCCESS:
+    break;
+  case ERROR_FILE_NOT_FOUND:
+    throw FileNotFoundError("RegOpenKeyEx", sub);
+  default:
     throw WindowsAPIError(status, "RegOpenKeyEx", sub);
+  }
 
-  INFO_LOG() << "RegOpenKeyEx: " << sub << " opened";
+  INFO_LOG() << "RegOpenKeyEx(" << sub << "): success";
   return status;
 }
 
@@ -44,11 +51,18 @@ long HKEYWrapper::Query(const std::string & value, std::string & data)
   DWORD len = 255;
   BYTE lpData[255];
   LRESULT status = ::RegQueryValueEx(hkey_, value.c_str(), NULL, NULL, lpData, &len);
-  if (ERROR_SUCCESS != status)
+  switch (status)
+  {
+  case ERROR_SUCCESS:
+    break;
+  case ERROR_FILE_NOT_FOUND:
+    throw FileNotFoundError("RegQueryValueEx", value);
+  default:
     throw WindowsAPIError(status, "RegQueryValueEx", value);
+  }
 
   data.assign((LPTSTR)lpData);
-  INFO_LOG() << "RegQueryValueEx: " << value << " = " << data;
+  INFO_LOG() << "RegQueryValueEx(" << value << "): " << data;
 
   return status;
 }
