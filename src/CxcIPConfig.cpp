@@ -55,7 +55,7 @@ void GetAllAdaptorInfo(std::vector<IPAdapterInfo> & adptInfos)
     INFO_LOG() << info.name << "|" << info.desc << "|" << info.index;
     
     adptInfos.push_back(info);
-  } // end of for pAdapter
+  } // for pAdapter
 }
 
 void GetAllAdaptorInfo2(std::vector<IPAdapterInfo> & adptInfos)
@@ -115,7 +115,7 @@ void GetAllAdaptorInfo3(std::vector<IPAdapterInfo> & adptInfos)
       WARN_LOG() << e.what();
       continue;
     }
-  }
+  } // for (auto info : adptInfos)
 }
 
 } // namespace CxcIPConfig
