@@ -48,9 +48,11 @@ long HKEYWrapper::Query(const std::string & value, std::string & data)
 {
   TRACE_FUNC1(value);
 
-  DWORD len = 255;
+  DWORD dwType = REG_SZ;
   BYTE lpData[255];
-  LRESULT status = ::RegQueryValueEx(hkey_, value.c_str(), NULL, NULL, lpData, &len);
+  DWORD len = 255;
+  LRESULT status = ::RegQueryValueEx(hkey_, value.c_str(), NULL, 
+    &dwType, lpData, &len);
   switch (status)
   {
   case ERROR_SUCCESS:
@@ -62,6 +64,31 @@ long HKEYWrapper::Query(const std::string & value, std::string & data)
   }
 
   data.assign((LPTSTR)lpData);
+  INFO_LOG() << "RegQueryValueEx(" << value << "): " << data;
+
+  return status;
+}
+
+long HKEYWrapper::Query(const std::string & value, int & data)
+{
+  TRACE_FUNC1(value);
+
+  DWORD dwType = REG_DWORD;
+  DWORD dwData = 0;
+  DWORD len = sizeof(DWORD);
+  LRESULT status = ::RegQueryValueEx(hkey_, value.c_str(), NULL, 
+    &dwType, ((LPBYTE)&dwData), &len);
+  switch (status)
+  {
+  case ERROR_SUCCESS:
+    break;
+  case ERROR_FILE_NOT_FOUND:
+    throw FileNotFoundError("RegQueryValueEx", value);
+  default:
+    throw WindowsAPIError(status, "RegQueryValueEx", value);
+  }
+
+  data = dwData;
   INFO_LOG() << "RegQueryValueEx(" << value << "): " << data;
 
   return status;

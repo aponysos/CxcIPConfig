@@ -107,9 +107,25 @@ void GetAllAdaptorInfo3(std::vector<IPAdapterInfo> & adptInfos)
     }
 
     try {
-      hkeyInterface.Query("IPAddress", info.ipAddr);
-      hkeyInterface.Query("SubnetMask", info.ipMask);
-      hkeyInterface.Query("DefaultGateway", info.ipGate);
+      int enableDHCP = -1;
+      hkeyInterface.Query("EnableDHCP", enableDHCP);
+      info.enableDHCP = (enableDHCP == 1);
+    }
+    catch (FileNotFoundError & e) {
+      WARN_LOG() << e.what();
+      continue;
+    }
+
+    try {
+      if (info.enableDHCP) {
+        hkeyInterface.Query("DhcpIPAddress", info.ipAddr);
+        hkeyInterface.Query("DhcpSubnetMask", info.ipMask);
+      }
+      else {
+        hkeyInterface.Query("IPAddress", info.ipAddr);
+        hkeyInterface.Query("SubnetMask", info.ipMask);
+        hkeyInterface.Query("DefaultGateway", info.ipGate);
+      }
     }
     catch (FileNotFoundError & e) {
       WARN_LOG() << e.what();

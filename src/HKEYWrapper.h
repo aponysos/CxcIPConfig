@@ -19,6 +19,7 @@ public:
   long Open(HKEY root, const std::string & sub, bool needWrite);
   void Close();
   long Query(const std::string & value, std::string & data);
+  long Query(const std::string & value, int & data);
 
 private:
   HKEY hkey_;
