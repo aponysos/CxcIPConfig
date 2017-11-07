@@ -14,8 +14,7 @@ int main(int /*argc*/, char ** /*argv*/)
   std::vector<IPAdapterInfo> adptInfos;
   try {
     GetAllAdaptors(adptInfos);
-    GetAllAdaptorInfo2(adptInfos);
-    GetAllAdaptorInfo3(adptInfos);
+    GetAdaptorsInfo(adptInfos);
   }
   catch (WindowsAPIError & e) {
     ERROR_LOG() << e.what();
@@ -28,73 +27,57 @@ int main(int /*argc*/, char ** /*argv*/)
 namespace CxcIPConfig
 {
 
-void GetAllAdaptorInfo2(std::vector<IPAdapterInfo> & adptInfos)
+void GetAdaptorsInfo(std::vector<IPAdapterInfo> & adptInfos)
 {
   TRACE_FUNC();
 
-  long status = ERROR_SUCCESS;
-  for (int i = 0; i < adptInfos.size(); ++i) {
-    IPAdapterInfo & info = adptInfos[i];
-
+  std::vector<IPAdapterInfo> filteredAdptInfos;
+  for (auto info : adptInfos) {
     std::ostringstream oss;
     oss << "SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002BE10318}\\" 
       << std::setw(4) << std::setfill('0') << info.index << "\\Ndi\\Interfaces";
 
-    HKEYWrapper hkeyInterface;
+    HKEYWrapper hkeyClass;
     try {
-      status = hkeyInterface.Open(HKEY_LOCAL_MACHINE, oss.str(), false);
+      hkeyClass.Open(HKEY_LOCAL_MACHINE, oss.str(), false);
     }
     catch (FileNotFoundError & e) {
       WARN_LOG() << e.what();
       continue;
     }
 
-    hkeyInterface.Query("LowerRange", info.type);
-  }
-}
-
-void GetAllAdaptorInfo3(std::vector<IPAdapterInfo> & adptInfos)
-{
-  TRACE_FUNC();
-
-  for (auto info : adptInfos) {
+    hkeyClass.Query("LowerRange", info.type);
     if (info.type.find("ethernet", 0) == std::string::npos) {
-      INFO_LOG() << info.desc << "(" << info.index << ") ignored with type: " << info.type ;
+      INFO_LOG() << info.desc << "(" << info.index << ") ignored with type: " << info.type;
       continue;
     }
 
+    filteredAdptInfos.push_back(info);
+  }
+
+  adptInfos.swap(filteredAdptInfos);
+
+  for (auto info : adptInfos) {
     std::ostringstream oss;
     oss << "SYSTEM\\CurrentControlSet\\services\\Tcpip\\Parameters\\Interfaces\\"
       << info.name;
 
-    HKEYWrapper hkeyInterface;
+    HKEYWrapper hkeyTcpip;
     try {
-      hkeyInterface.Open(HKEY_LOCAL_MACHINE, oss.str(), false);
-    }
-    catch (FileNotFoundError & e) {
-      WARN_LOG() << e.what();
-      continue;
-    }
+      hkeyTcpip.Open(HKEY_LOCAL_MACHINE, oss.str(), false);
 
-    try {
-      int enableDHCP = -1;
-      hkeyInterface.Query("EnableDHCP", enableDHCP);
+      int enableDHCP = 0;
+      hkeyTcpip.Query("EnableDHCP", enableDHCP);
       info.enableDHCP = (enableDHCP == 1);
-    }
-    catch (FileNotFoundError & e) {
-      WARN_LOG() << e.what();
-      continue;
-    }
 
-    try {
       if (info.enableDHCP) {
-        hkeyInterface.Query("DhcpIPAddress", info.ipAddr);
-        hkeyInterface.Query("DhcpSubnetMask", info.ipMask);
+        hkeyTcpip.Query("DhcpIPAddress", info.ipAddr);
+        hkeyTcpip.Query("DhcpSubnetMask", info.ipMask);
       }
       else {
-        hkeyInterface.Query("IPAddress", info.ipAddr);
-        hkeyInterface.Query("SubnetMask", info.ipMask);
-        hkeyInterface.Query("DefaultGateway", info.ipGate);
+        hkeyTcpip.Query("IPAddress", info.ipAddr);
+        hkeyTcpip.Query("SubnetMask", info.ipMask);
+        hkeyTcpip.Query("DefaultGateway", info.ipGate);
       }
     }
     catch (FileNotFoundError & e) {

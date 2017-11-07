@@ -13,9 +13,10 @@ struct IPAdapterInfo
   std::string ipMask; // ip mask
   std::string ipGate; // ip gateway
   bool enableDHCP; // enable DHCP
+
+  IPAdapterInfo() : index(0), enableDHCP(false) {}
 };
 
-void GetAllAdaptorInfo2(std::vector<IPAdapterInfo> & adptInfos);
-void GetAllAdaptorInfo3(std::vector<IPAdapterInfo> & adptInfos);
+void GetAdaptorsInfo(std::vector<IPAdapterInfo> & adptInfos);
 
 } // namespace CxcIPConfig
