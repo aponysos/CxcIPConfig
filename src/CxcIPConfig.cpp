@@ -89,7 +89,7 @@ void GetAllAdaptorInfo3(std::vector<IPAdapterInfo> & adptInfos)
 
   for (auto info : adptInfos) {
     if (info.type.find("ethernet", 0) == std::string::npos) {
-      INFO_LOG() << info.desc << " ignored with type: " << info.type ;
+      INFO_LOG() << info.desc << "(" << info.index << ") ignored with type: " << info.type ;
       continue;
     }
 
