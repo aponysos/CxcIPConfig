@@ -18,9 +18,10 @@ void GetAllAdaptors(std::vector<IPAdapterInfo> & adptInfos)
     throw WindowsAPIError(err, "GetAdaptersInfo", "probe");
 
   size_t nNeeded = ulOutBufLen / sizeof(IP_ADAPTER_INFO);
-  std::unique_ptr<IP_ADAPTER_INFO[]> infos(new IP_ADAPTER_INFO[nNeeded]);
   INFO_LOG() << "GetAdaptersInfo(probe): " << nNeeded << " IP_ADAPTER_INFO needed";
 
+  if (nNeeded <= 1) nNeeded = 2;
+  std::unique_ptr<IP_ADAPTER_INFO[]> infos(new IP_ADAPTER_INFO[nNeeded]);
   err = ::GetAdaptersInfo(infos.get(), &ulOutBufLen);
   if (ERROR_SUCCESS != err)
     throw WindowsAPIError(err, "GetAdaptersInfo");

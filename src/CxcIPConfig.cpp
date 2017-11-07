@@ -13,8 +13,8 @@ int main(int argc, char **argv)
 
   std::vector<IPAdapterInfo> adptInfos;
   try {
-    //GetAllAdaptors(adptInfos);
-    //GetAdaptorsInfo(adptInfos);
+    GetAllAdaptors(adptInfos);
+    GetAdaptorsInfo(adptInfos);
   }
   catch (WindowsAPIError & e) {
     ERROR_LOG() << e.what();
