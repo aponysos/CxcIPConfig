@@ -25,4 +25,4 @@ public:
   virtual std::string GetErrorMsg() const;
 };
 
-}
+} // namespace CxcIPConfig

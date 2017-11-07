@@ -13,4 +13,4 @@ inline std::string ToString(const T & val)
   return oss.str();
 }
 
-}
+} // namespace CxcIPConfig

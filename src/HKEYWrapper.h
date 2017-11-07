@@ -25,4 +25,4 @@ private:
   HKEY hkey_;
 };
 
-}
+} // namespace CxcIPConfig

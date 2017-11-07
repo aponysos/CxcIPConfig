@@ -37,4 +37,4 @@ void GetAllAdaptors(std::vector<IPAdapterInfo> & adptInfos)
   } // for pAdapter
 }
 
-}
+} // namespace CxcIPConfig

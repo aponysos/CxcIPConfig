@@ -42,4 +42,4 @@ std::string FileNotFoundError::GetErrorMsg() const
     .append(") The system cannot find the file specified.");
 }
 
-}
+} // namespace CxcIPConfig

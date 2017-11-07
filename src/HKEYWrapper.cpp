@@ -94,4 +94,4 @@ long HKEYWrapper::Query(const std::string & value, int & data)
   return status;
 }
 
-}
+} // namespace CxcIPConfig
