@@ -15,7 +15,6 @@ struct IPAdapterInfo
   bool enableDHCP; // enable DHCP
 };
 
-void GetAllAdaptorInfo(std::vector<IPAdapterInfo> & adptInfos);
 void GetAllAdaptorInfo2(std::vector<IPAdapterInfo> & adptInfos);
 void GetAllAdaptorInfo3(std::vector<IPAdapterInfo> & adptInfos);
 

@@ -2,6 +2,7 @@
 #include "CxcIPConfig.h"
 #include "Util.h"
 #include "WindowsAPIError.h"
+#include "IphlpApiWrapper.h"
 #include "HKEYWrapper.h"
 
 using namespace CxcIPConfig;
@@ -12,7 +13,7 @@ int main(int /*argc*/, char ** /*argv*/)
 
   std::vector<IPAdapterInfo> adptInfos;
   try {
-    GetAllAdaptorInfo(adptInfos);
+    GetAllAdaptors(adptInfos);
     GetAllAdaptorInfo2(adptInfos);
     GetAllAdaptorInfo3(adptInfos);
   }
@@ -26,37 +27,6 @@ int main(int /*argc*/, char ** /*argv*/)
 
 namespace CxcIPConfig
 {
-
-void GetAllAdaptorInfo(std::vector<IPAdapterInfo> & adptInfos)
-{
-  TRACE_FUNC();
-
-  ULONG err = ERROR_SUCCESS;
-  ULONG ulOutBufLen = 0;
-  
-  err = ::GetAdaptersInfo(NULL, &ulOutBufLen);
-  if (ERROR_BUFFER_OVERFLOW != err)
-    throw WindowsAPIError(err, "GetAdaptersInfo(probe)");
-
-  size_t nNeeded = ulOutBufLen / sizeof(IP_ADAPTER_INFO);
-  INFO_LOG() << "GetAdaptersInfo(probe): " << nNeeded << " IP_ADAPTER_INFO needed";
-  std::unique_ptr<IP_ADAPTER_INFO[]> infos(new IP_ADAPTER_INFO[nNeeded]);
-  
-  err = ::GetAdaptersInfo(infos.get(), &ulOutBufLen);
-  if (ERROR_SUCCESS != err)
-    throw WindowsAPIError(err, "GetAdaptersInfo");
-
-  for (PIP_ADAPTER_INFO pAdapter = infos.get();
-    pAdapter; pAdapter = pAdapter->Next) {
-    IPAdapterInfo info;
-    info.name = pAdapter->AdapterName;
-    info.desc = pAdapter->Description;
-    info.index = pAdapter->Index;
-    INFO_LOG() << info.name << "|" << info.desc << "|" << info.index;
-    
-    adptInfos.push_back(info);
-  } // for pAdapter
-}
 
 void GetAllAdaptorInfo2(std::vector<IPAdapterInfo> & adptInfos)
 {
