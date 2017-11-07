@@ -21,7 +21,7 @@ long HKEYWrapper::Open(HKEY root, const std::string & sub, bool needWrite)
 
   Close();
 
-  LRESULT status = ::RegOpenKeyEx(root, sub.c_str(), 0,
+  LSTATUS status = ::RegOpenKeyEx(root, sub.c_str(), 0,
     needWrite ? KEY_WRITE : KEY_READ, &hkey_);
   switch (status)
   {
@@ -51,7 +51,7 @@ long HKEYWrapper::Query(const std::string & value, std::string & data)
   DWORD dwType = REG_SZ;
   BYTE lpData[255];
   DWORD len = 255;
-  LRESULT status = ::RegQueryValueEx(hkey_, value.c_str(), NULL, 
+  LSTATUS status = ::RegQueryValueEx(hkey_, value.c_str(), NULL,
     &dwType, lpData, &len);
   switch (status)
   {
@@ -76,7 +76,7 @@ long HKEYWrapper::Query(const std::string & value, int & data)
   DWORD dwType = REG_DWORD;
   DWORD dwData = 0;
   DWORD len = sizeof(DWORD);
-  LRESULT status = ::RegQueryValueEx(hkey_, value.c_str(), NULL, 
+  LSTATUS status = ::RegQueryValueEx(hkey_, value.c_str(), NULL,
     &dwType, ((LPBYTE)&dwData), &len);
   switch (status)
   {

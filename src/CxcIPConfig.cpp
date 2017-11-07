@@ -7,21 +7,32 @@
 
 using namespace CxcIPConfig;
 
-int main(int /*argc*/, char ** /*argv*/)
+int main(int argc, char **argv)
 {
   InitLog();
 
   std::vector<IPAdapterInfo> adptInfos;
   try {
-    GetAllAdaptors(adptInfos);
-    GetAdaptorsInfo(adptInfos);
+    //GetAllAdaptors(adptInfos);
+    //GetAdaptorsInfo(adptInfos);
   }
   catch (WindowsAPIError & e) {
     ERROR_LOG() << e.what();
   }
 
-  INFO_LOG() << "CxcIPConfig program end\n";
-  return 0;
+  Fl_Window* window = new Fl_Window(300, 180);
+  Fl_Box* box = new Fl_Box(20, 40, 260, 100, "Hello, World!");
+  box->box(FL_UP_BOX);
+  box->labelsize(36);
+  box->labelfont(FL_BOLD + FL_ITALIC);
+  box->labeltype(FL_SHADOW_LABEL);
+
+  window->end();
+  window->show(argc, argv);
+  return Fl::run();
+
+  //INFO_LOG() << "CxcIPConfig program end\n";
+  //return 0;
 }
 
 namespace CxcIPConfig
