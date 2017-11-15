@@ -4,6 +4,7 @@
 # User-specific files
 *.suo
 *.user
+*.user
 *.userosscache
 *.sln.docstates
 
@@ -260,6 +261,13 @@ paket-files/
 __pycache__/
 *.pyc
 
+sync_log4cpp.bat
+
 # except: 3rd party libraries
 !/lib/*
-sync_log4cpp.bat
+!/lib/Debug/Win32/*
+!/lib/Debug/x64/
+!/lib/Debug/x64/*
+!/lib/Release/Win32/*
+!/lib/Release/x64/
+!/lib/Release/x64/*
