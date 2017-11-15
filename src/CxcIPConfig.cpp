@@ -89,6 +89,7 @@ void GetAdaptorsInfo(std::vector<IPAdapterInfo> & adptInfos)
         hkeyTcpip.Query("IPAddress", info.ipAddr);
         hkeyTcpip.Query("SubnetMask", info.ipMask);
         hkeyTcpip.Query("DefaultGateway", info.ipGate);
+        hkeyTcpip.Query("NameServer", info.dns);
       }
     }
     catch (FileNotFoundError & e) {

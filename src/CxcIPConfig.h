@@ -9,10 +9,11 @@ struct IPAdapterInfo
   std::string desc; // description
   int index;
   std::string type; // type string
+  bool enableDHCP; // enable DHCP
   std::string ipAddr; // ip address
   std::string ipMask; // ip mask
   std::string ipGate; // ip gateway
-  bool enableDHCP; // enable DHCP
+  std::string dns; // dns
 
   IPAdapterInfo() : index(0), enableDHCP(false) {}
 };
