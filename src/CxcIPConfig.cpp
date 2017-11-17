@@ -7,6 +7,12 @@
 
 using namespace CxcIPConfig;
 
+Fl_Choice * choice;
+void selected(Fl_Widget *, void *)
+{
+  INFO_LOG() << choice->value() << " selected";
+}
+
 int main(int argc, char **argv)
 {
   InitLog();
@@ -18,14 +24,22 @@ int main(int argc, char **argv)
   }
   catch (WindowsAPIError & e) {
     ERROR_LOG() << e.what();
+    return e.GetErrorCode();
   }
 
-  Fl_Window* window = new Fl_Window(300, 180);
-  Fl_Box* box = new Fl_Box(20, 40, 260, 100, "Hello, World!");
-  box->box(FL_UP_BOX);
-  box->labelsize(36);
-  box->labelfont(FL_BOLD + FL_ITALIC);
-  box->labeltype(FL_SHADOW_LABEL);
+  Fl_Window * window = new Fl_Window(300, 180);
+  
+  choice = new Fl_Choice(80, 20, 200, 20, "Interface: ");
+  choice->add(adptInfos[0].desc.c_str(), NULL, selected);
+
+  Fl_Input * inputIpAddr = new Fl_Input(80, 60, 200, 20, "IP Address: ");
+  inputIpAddr->value(adptInfos[0].ipAddr.c_str());
+
+  //Fl_Box * box = new Fl_Box(20, 80, 260, 100, "Hello, World!");
+  //box->box(FL_UP_BOX);
+  //box->labelsize(36);
+  //box->labelfont(FL_BOLD + FL_ITALIC);
+  //box->labeltype(FL_SHADOW_LABEL);
 
   window->end();
   window->show(argc, argv);
@@ -67,6 +81,7 @@ void GetAdaptorsInfo(std::vector<IPAdapterInfo> & adptInfos)
   }
 
   adptInfos.swap(filteredAdptInfos);
+  filteredAdptInfos.clear();
 
   for (auto info : adptInfos) {
     std::ostringstream oss;
@@ -91,12 +106,16 @@ void GetAdaptorsInfo(std::vector<IPAdapterInfo> & adptInfos)
         hkeyTcpip.Query("DefaultGateway", info.ipGate);
         hkeyTcpip.Query("NameServer", info.dns);
       }
+
+      filteredAdptInfos.push_back(info);
     }
     catch (FileNotFoundError & e) {
       WARN_LOG() << e.what();
       continue;
     }
   } // for (auto info : adptInfos)
+
+  adptInfos.swap(filteredAdptInfos);
 }
 
 } // namespace CxcIPConfig
