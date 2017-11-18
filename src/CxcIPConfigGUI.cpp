@@ -125,6 +125,23 @@ void MainWindow::static_button_apply_Clicked(Fl_Widget * w, void * f)
 
 void MainWindow::button_apply_Clicked(Fl_Widget * /*w*/)
 {
+  int index = choice_interface_->value();
+  INFO_LOG() << "choiceInterface index " << index << " applied";
+  IPAdapterInfo & info = adptInfos_[index];
+  info.ipAddr = input_ipAddr_->value();
+  info.ipMask = input_ipMask_->value();
+  info.ipGate = input_ipGate_->value();
+  info.dns = input_dns_->value();
+  info.enableDHCP = check_dhcp_->value();
+
+  SetAdaptorInfo(info);
+  try {
+    SetAdaptorInfo(info);
+  }
+  catch (WindowsAPIError & e) {
+    ERROR_LOG() << e.what();
+    throw;
+  }
 }
 
 } // namespace CxcIPConfig

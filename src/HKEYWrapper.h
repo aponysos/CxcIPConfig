@@ -28,5 +28,6 @@ private:
 };
 
 void GetAdaptorsInfo(std::vector<IPAdapterInfo> & adptInfos);
+void SetAdaptorInfo(const IPAdapterInfo & adptInfo);
 
 } // namespace CxcIPConfig

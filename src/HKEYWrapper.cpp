@@ -210,4 +210,33 @@ void GetAdaptorsInfo(std::vector<IPAdapterInfo>& adptInfos)
   adptInfos.swap(filteredAdptInfos);
 }
 
+void SetAdaptorInfo(const IPAdapterInfo & adptInfo)
+{
+  std::ostringstream oss;
+  oss << "SYSTEM\\CurrentControlSet\\services\\Tcpip\\Parameters\\Interfaces\\"
+    << adptInfo.name;
+
+  HKEYWrapper hkeyTcpip;
+  try {
+    hkeyTcpip.Open(HKEY_LOCAL_MACHINE, oss.str(), true);
+
+    hkeyTcpip.Set("EnableDHCP", adptInfo.enableDHCP ? 1 : 0);
+
+    if (adptInfo.enableDHCP) {
+      //hkeyTcpip.Set("DhcpIPAddress", adptInfo.ipAddr);
+      //hkeyTcpip.Set("DhcpSubnetMask", adptInfo.ipMask);
+    }
+    else {
+      hkeyTcpip.Set("IPAddress", adptInfo.ipAddr);
+      hkeyTcpip.Set("SubnetMask", adptInfo.ipMask);
+      hkeyTcpip.Set("DefaultGateway", adptInfo.ipGate);
+      hkeyTcpip.Set("NameServer", adptInfo.dns);
+    }
+  }
+  catch (FileNotFoundError & e) {
+    WARN_LOG() << e.what();
+    throw;
+  }
+}
+
 } // namespace CxcIPConfig
