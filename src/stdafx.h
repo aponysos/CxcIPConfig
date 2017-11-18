@@ -22,3 +22,7 @@
 #include "FL/Fl_Input.H"
 #include "FL/Fl_Check_Button.H"
 #pragma warning(pop)
+
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"

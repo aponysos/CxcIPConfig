@@ -5,6 +5,8 @@
 #include "IphlpApiWrapper.h"
 #include "HKEYWrapper.h"
 
+using namespace rapidjson;
+
 namespace CxcIPConfig
 {
 
@@ -53,11 +55,23 @@ void MainWindow::choiceInterface_Selected(Fl_Widget * /*w*/)
 {
   int index = choiceInterface_->value();
   INFO_LOG() << "choiceInterface index " << index << " selected";
-  input_ipAddr_->value(adptInfos_[index].ipAddr.c_str());
-  input_ipMask_->value(adptInfos_[index].ipMask.c_str());
-  input_ipGate_->value(adptInfos_[index].ipGate.c_str());
-  input_dns_->value(adptInfos_[index].dns.c_str());
-  check_dhcp_->value(adptInfos_[index].enableDHCP);
+  IPAdapterInfo & info = adptInfos_[index];
+  input_ipAddr_->value(info.ipAddr.c_str());
+  input_ipMask_->value(info.ipMask.c_str());
+  input_ipGate_->value(info.ipGate.c_str());
+  input_dns_->value(info.dns.c_str());
+  check_dhcp_->value(info.enableDHCP);
+
+
+  StringBuffer buffer;
+  //std::ofstream ofs("out.json");
+  Writer<StringBuffer> writer(buffer);
+  writer.StartObject();
+  writer.Key("ipAddr");
+  writer.String(input_ipAddr_->value());
+  writer.EndObject();
+
+  INFO_LOG() << buffer.GetString();
 }
 
 } // namespace CxcIPConfig
