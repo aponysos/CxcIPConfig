@@ -19,6 +19,8 @@ private:
   void button_save_Clicked(Fl_Widget * w);
   static void static_button_load_Clicked(Fl_Widget * w, void * f);
   void button_load_Clicked(Fl_Widget * w);
+  static void static_button_apply_Clicked(Fl_Widget * w, void * f);
+  void button_apply_Clicked(Fl_Widget * w);
 
 private:
   std::vector<IPAdapterInfo> adptInfos_;
@@ -30,6 +32,7 @@ private:
   Fl_Check_Button * check_dhcp_;
   Fl_Button * button_save_;
   Fl_Button * button_load_;
+  Fl_Button * button_apply_;
 };
 
 } // namespace CxcIPConfig

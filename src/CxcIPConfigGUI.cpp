@@ -31,6 +31,7 @@ void MainWindow::init()
   check_dhcp_ = new Fl_Check_Button(80, 140, 200, 20, "Enable DHCP: ");
   button_save_ = new Fl_Button(80, 160, 200, 20, "Save");
   button_load_ = new Fl_Button(80, 180, 200, 20, "Load");
+  button_apply_ = new Fl_Button(80, 200, 200, 20, "Apply");
 
   end();
 
@@ -47,6 +48,7 @@ void MainWindow::init()
     choice_interface_->add(adptInfo.desc.c_str(), NULL, static_choice_interface_Selected, this);
   button_save_->callback(static_button_save_Clicked, this);
   button_load_->callback(static_button_load_Clicked, this);
+  button_apply_->callback(static_button_apply_Clicked, this);
 }
 
 //static
@@ -111,6 +113,15 @@ void MainWindow::button_load_Clicked(Fl_Widget * /*w*/)
   input_dns_->value(d["dns"].GetString());
 
   INFO_LOG() << "loaded: " << json;
+}
+
+void MainWindow::static_button_apply_Clicked(Fl_Widget * w, void * f)
+{
+  ((MainWindow *)f)->button_apply_Clicked(w);
+}
+
+void MainWindow::button_apply_Clicked(Fl_Widget * /*w*/)
+{
 }
 
 } // namespace CxcIPConfig
