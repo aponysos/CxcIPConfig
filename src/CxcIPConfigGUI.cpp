@@ -87,6 +87,8 @@ void MainWindow::button_save_Clicked(Fl_Widget * /*w*/)
   writer.String(input_ipGate_->value());
   writer.Key("dns");
   writer.String(input_dns_->value());
+  writer.Key("dhcp");
+  writer.Int(check_dhcp_->value());
   writer.EndObject();
 
   std::ofstream ofs("out.json");
@@ -111,6 +113,7 @@ void MainWindow::button_load_Clicked(Fl_Widget * /*w*/)
   input_ipMask_->value(d["ipMask"].GetString());
   input_ipGate_->value(d["ipGate"].GetString());
   input_dns_->value(d["dns"].GetString());
+  check_dhcp_->value(d["dhcp"].GetInt());
 
   INFO_LOG() << "loaded: " << json;
 }
