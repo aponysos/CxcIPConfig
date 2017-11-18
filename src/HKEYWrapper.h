@@ -25,4 +25,6 @@ private:
   HKEY hkey_;
 };
 
+void GetAdaptorsInfo(std::vector<IPAdapterInfo> & adptInfos);
+
 } // namespace CxcIPConfig

@@ -20,4 +20,5 @@
 #include "FL/Fl_Box.H"
 #include "FL/Fl_Choice.H"
 #include "FL/Fl_Input.H"
+#include "FL/Fl_Check_Button.H"
 #pragma warning(pop)

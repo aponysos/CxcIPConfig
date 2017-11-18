@@ -151,6 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CxcIPConfig.cpp" />
+    <ClCompile Include="..\src\CxcIPConfigGUI.cpp" />
     <ClCompile Include="..\src\HKEYWrapper.cpp" />
     <ClCompile Include="..\src\IphlpApiWrapper.cpp" />
     <ClCompile Include="..\src\stdafx.cpp">
@@ -164,6 +165,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CxcIPConfig.h" />
+    <ClInclude Include="..\src\CxcIPConfigGUI.h" />
     <ClInclude Include="..\src\HKEYWrapper.h" />
     <ClInclude Include="..\src\IphlpApiWrapper.h" />
     <ClInclude Include="..\src\stdafx.h" />

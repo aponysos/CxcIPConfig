@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "CxcIPConfig.h"
 #include "WindowsAPIError.h"
 #include "HKEYWrapper.h"
 
@@ -92,6 +93,72 @@ long HKEYWrapper::Query(const std::string & value, int & data)
   INFO_LOG() << "RegQueryValueEx(" << value << "): " << data;
 
   return status;
+}
+
+void GetAdaptorsInfo(std::vector<IPAdapterInfo>& adptInfos)
+{
+  TRACE_FUNC();
+
+  std::vector<IPAdapterInfo> filteredAdptInfos;
+  for (auto info : adptInfos) {
+    std::ostringstream oss;
+    oss << "SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002BE10318}\\"
+      << std::setw(4) << std::setfill('0') << info.index << "\\Ndi\\Interfaces";
+
+    HKEYWrapper hkeyClass;
+    try {
+      hkeyClass.Open(HKEY_LOCAL_MACHINE, oss.str(), false);
+    }
+    catch (FileNotFoundError & e) {
+      WARN_LOG() << e.what();
+      continue;
+    }
+
+    hkeyClass.Query("LowerRange", info.type);
+    if (info.type.find("ethernet", 0) == std::string::npos) {
+      INFO_LOG() << info.desc << "(" << info.index << ") ignored with type: " << info.type;
+      continue;
+    }
+
+    filteredAdptInfos.push_back(info);
+  }
+
+  adptInfos.swap(filteredAdptInfos);
+  filteredAdptInfos.clear();
+
+  for (auto info : adptInfos) {
+    std::ostringstream oss;
+    oss << "SYSTEM\\CurrentControlSet\\services\\Tcpip\\Parameters\\Interfaces\\"
+      << info.name;
+
+    HKEYWrapper hkeyTcpip;
+    try {
+      hkeyTcpip.Open(HKEY_LOCAL_MACHINE, oss.str(), false);
+
+      int enableDHCP = 0;
+      hkeyTcpip.Query("EnableDHCP", enableDHCP);
+      info.enableDHCP = (enableDHCP == 1);
+
+      if (info.enableDHCP) {
+        hkeyTcpip.Query("DhcpIPAddress", info.ipAddr);
+        hkeyTcpip.Query("DhcpSubnetMask", info.ipMask);
+      }
+      else {
+        hkeyTcpip.Query("IPAddress", info.ipAddr);
+        hkeyTcpip.Query("SubnetMask", info.ipMask);
+        hkeyTcpip.Query("DefaultGateway", info.ipGate);
+        hkeyTcpip.Query("NameServer", info.dns);
+      }
+
+      filteredAdptInfos.push_back(info);
+    }
+    catch (FileNotFoundError & e) {
+      WARN_LOG() << e.what();
+      continue;
+    }
+  } // for (auto info : adptInfos)
+
+  adptInfos.swap(filteredAdptInfos);
 }
 
 } // namespace CxcIPConfig

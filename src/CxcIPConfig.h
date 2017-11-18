@@ -18,6 +18,4 @@ struct IPAdapterInfo
   IPAdapterInfo() : index(0), enableDHCP(false) {}
 };
 
-void GetAdaptorsInfo(std::vector<IPAdapterInfo> & adptInfos);
-
 } // namespace CxcIPConfig
