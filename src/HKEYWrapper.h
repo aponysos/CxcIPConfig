@@ -20,6 +20,8 @@ public:
   void Close();
   long Query(const std::string & value, std::string & data);
   long Query(const std::string & value, int & data);
+  long Set(const std::string & value, const std::string & data);
+  long Set(const std::string & value, int data);
 
 private:
   HKEY hkey_;

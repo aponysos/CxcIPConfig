@@ -95,6 +95,55 @@ long HKEYWrapper::Query(const std::string & value, int & data)
   return status;
 }
 
+long HKEYWrapper::Set(const std::string & value, const std::string & data)
+{
+  TRACE_FUNC1(value);
+
+  DWORD dwType = REG_SZ;
+  BYTE lpData[255];
+  DWORD len = 255;
+  ::strncpy_s((char *)lpData, len, data.data(), data.length());
+  LSTATUS status = ::RegSetValueEx(hkey_, value.c_str(), NULL,
+    dwType, lpData, len);
+  switch (status)
+  {
+  case ERROR_SUCCESS:
+    break;
+  case ERROR_FILE_NOT_FOUND:
+    throw FileNotFoundError("RegSetValueEx", value);
+  default:
+    throw WindowsAPIError(status, "RegSetValueEx", value);
+  }
+
+  INFO_LOG() << "RegSetValueEx(" << value << "): " << data;
+
+  return status;
+}
+
+long HKEYWrapper::Set(const std::string & value, int data)
+{
+  TRACE_FUNC1(value);
+
+  DWORD dwType = REG_DWORD;
+  DWORD dwData = data;
+  DWORD len = sizeof(DWORD);
+  LSTATUS status = ::RegSetValueEx(hkey_, value.c_str(), NULL,
+    dwType, ((LPBYTE)&dwData), len);
+  switch (status)
+  {
+  case ERROR_SUCCESS:
+    break;
+  case ERROR_FILE_NOT_FOUND:
+    throw FileNotFoundError("RegSetValueEx", value);
+  default:
+    throw WindowsAPIError(status, "RegSetValueEx", value);
+  }
+
+  INFO_LOG() << "RegSetValueEx(" << value << "): " << data;
+
+  return status;
+}
+
 void GetAdaptorsInfo(std::vector<IPAdapterInfo>& adptInfos)
 {
   TRACE_FUNC();
