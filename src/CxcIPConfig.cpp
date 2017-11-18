@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 {
   InitLog();
 
-  MainWindow * window = new MainWindow(300, 180, "CxcIPConfig");
+  MainWindow * window = new MainWindow();
   window->init();
   window->show(argc, argv);
 

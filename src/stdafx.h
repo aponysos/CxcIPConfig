@@ -7,6 +7,7 @@
 #include <memory>
 #include <iomanip>
 #include <sstream>
+#include <fstream>
 #include <WinSock2.h>
 #include <iphlpapi.h>
 

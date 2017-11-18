@@ -10,8 +10,8 @@ using namespace rapidjson;
 namespace CxcIPConfig
 {
 
-MainWindow::MainWindow(int w, int h, const char * t)
-  : Fl_Window(w, h, t)
+MainWindow::MainWindow()
+  : Fl_Window(300, 300, "CxcIPConfig")
 {
 }
 
@@ -23,12 +23,14 @@ void MainWindow::init()
 {
   TRACE_FUNC();
 
-  choiceInterface_ = new Fl_Choice(80, 20, 200, 20, "Interface: ");
+  choice_interface_ = new Fl_Choice(80, 20, 200, 20, "Interface: ");
   input_ipAddr_ = new Fl_Input(80, 60, 200, 20, "IP Address: ");
   input_ipMask_ = new Fl_Input(80, 80, 200, 20, "IP Mask: ");
   input_ipGate_ = new Fl_Input(80, 100, 200, 20, "IP Gate: ");
   input_dns_ = new Fl_Input(80, 120, 200, 20, "DNS: ");
   check_dhcp_ = new Fl_Check_Button(80, 140, 200, 20, "Enable DHCP: ");
+  button_save_ = new Fl_Button(80, 160, 200, 20, "Save");
+  button_load_ = new Fl_Button(80, 180, 200, 20, "Load");
 
   end();
 
@@ -42,18 +44,20 @@ void MainWindow::init()
   }
 
   for (auto adptInfo : adptInfos_)
-    choiceInterface_->add(adptInfo.desc.c_str(), NULL, static_choiceInterface_Selected, this);
+    choice_interface_->add(adptInfo.desc.c_str(), NULL, static_choice_interface_Selected, this);
+  button_save_->callback(static_button_save_Clicked, this);
+  button_load_->callback(static_button_load_Clicked, this);
 }
 
 //static
-void MainWindow::static_choiceInterface_Selected(Fl_Widget * w, void * f)
+void MainWindow::static_choice_interface_Selected(Fl_Widget * w, void * f)
 {
-  ((MainWindow *)f)->choiceInterface_Selected(w);
+  ((MainWindow *)f)->choice_interface_Selected(w);
 }
 
-void MainWindow::choiceInterface_Selected(Fl_Widget * /*w*/)
+void MainWindow::choice_interface_Selected(Fl_Widget * /*w*/)
 {
-  int index = choiceInterface_->value();
+  int index = choice_interface_->value();
   INFO_LOG() << "choiceInterface index " << index << " selected";
   IPAdapterInfo & info = adptInfos_[index];
   input_ipAddr_->value(info.ipAddr.c_str());
@@ -61,17 +65,52 @@ void MainWindow::choiceInterface_Selected(Fl_Widget * /*w*/)
   input_ipGate_->value(info.ipGate.c_str());
   input_dns_->value(info.dns.c_str());
   check_dhcp_->value(info.enableDHCP);
+}
 
+void MainWindow::static_button_save_Clicked(Fl_Widget * w, void * f)
+{
+  ((MainWindow *)f)->button_save_Clicked(w);
+}
 
+void MainWindow::button_save_Clicked(Fl_Widget * /*w*/)
+{
   StringBuffer buffer;
-  //std::ofstream ofs("out.json");
   Writer<StringBuffer> writer(buffer);
   writer.StartObject();
   writer.Key("ipAddr");
   writer.String(input_ipAddr_->value());
+  writer.Key("ipMask");
+  writer.String(input_ipMask_->value());
+  writer.Key("ipGate");
+  writer.String(input_ipGate_->value());
+  writer.Key("dns");
+  writer.String(input_dns_->value());
   writer.EndObject();
 
-  INFO_LOG() << buffer.GetString();
+  std::ofstream ofs("out.json");
+  ofs << buffer.GetString();
+  INFO_LOG() << "saved: " << buffer.GetString();
+}
+
+void MainWindow::static_button_load_Clicked(Fl_Widget * w, void * f)
+{
+  ((MainWindow *)f)->button_load_Clicked(w);
+}
+
+void MainWindow::button_load_Clicked(Fl_Widget * /*w*/)
+{
+  std::ifstream ifs("out.json");
+  std::string json;
+  ifs >> json;
+
+  Document d;
+  d.Parse(json.c_str());
+  input_ipAddr_->value(d["ipAddr"].GetString());
+  input_ipMask_->value(d["ipMask"].GetString());
+  input_ipGate_->value(d["ipGate"].GetString());
+  input_dns_->value(d["dns"].GetString());
+
+  INFO_LOG() << "loaded: " << json;
 }
 
 } // namespace CxcIPConfig
