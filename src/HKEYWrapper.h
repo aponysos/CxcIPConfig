@@ -18,9 +18,9 @@ public:
 
   long Open(HKEY root, const std::string & sub, bool needWrite);
   void Close();
-  long Query(const std::string & value, std::string & data);
+  long Query(const std::string & value, std::string & data, bool multi = false);
   long Query(const std::string & value, int & data);
-  long Set(const std::string & value, const std::string & data);
+  long Set(const std::string & value, const std::string & data, bool multi = false);
   long Set(const std::string & value, int data);
 
 private:

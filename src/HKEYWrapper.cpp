@@ -45,11 +45,11 @@ void HKEYWrapper::Close()
   hkey_ = NULL;
 }
 
-long HKEYWrapper::Query(const std::string & value, std::string & data)
+long HKEYWrapper::Query(const std::string & value, std::string & data, bool multi)
 {
   TRACE_FUNC1(value);
 
-  DWORD dwType = REG_SZ;
+  DWORD dwType = multi ? REG_MULTI_SZ : REG_SZ;
   BYTE lpData[255];
   DWORD len = 255;
   LSTATUS status = ::RegQueryValueEx(hkey_, value.c_str(), NULL,
@@ -95,11 +95,11 @@ long HKEYWrapper::Query(const std::string & value, int & data)
   return status;
 }
 
-long HKEYWrapper::Set(const std::string & value, const std::string & data)
+long HKEYWrapper::Set(const std::string & value, const std::string & data, bool multi)
 {
   TRACE_FUNC1(value);
 
-  DWORD dwType = REG_SZ;
+  DWORD dwType = multi ? REG_MULTI_SZ : REG_SZ;
   BYTE lpData[255];
   DWORD len = 255;
   ::strncpy_s((char *)lpData, len, data.data(), data.length());
@@ -193,9 +193,9 @@ void GetAdaptorsInfo(std::vector<IPAdapterInfo>& adptInfos)
         hkeyTcpip.Query("DhcpSubnetMask", info.ipMask);
       }
       else {
-        hkeyTcpip.Query("IPAddress", info.ipAddr);
-        hkeyTcpip.Query("SubnetMask", info.ipMask);
-        hkeyTcpip.Query("DefaultGateway", info.ipGate);
+        hkeyTcpip.Query("IPAddress", info.ipAddr, true);
+        hkeyTcpip.Query("SubnetMask", info.ipMask, true);
+        hkeyTcpip.Query("DefaultGateway", info.ipGate, true);
         hkeyTcpip.Query("NameServer", info.dns);
       }
 
@@ -227,9 +227,9 @@ void SetAdaptorInfo(const IPAdapterInfo & adptInfo)
       //hkeyTcpip.Set("DhcpSubnetMask", adptInfo.ipMask);
     }
     else {
-      hkeyTcpip.Set("IPAddress", adptInfo.ipAddr);
-      hkeyTcpip.Set("SubnetMask", adptInfo.ipMask);
-      hkeyTcpip.Set("DefaultGateway", adptInfo.ipGate);
+      hkeyTcpip.Set("IPAddress", adptInfo.ipAddr, true);
+      hkeyTcpip.Set("SubnetMask", adptInfo.ipMask, true);
+      hkeyTcpip.Set("DefaultGateway", adptInfo.ipGate, true);
       hkeyTcpip.Set("NameServer", adptInfo.dns);
     }
   }
