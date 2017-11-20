@@ -49,11 +49,11 @@ long HKEYWrapper::Query(const std::string & value, std::string & data, bool mult
 {
   TRACE_FUNC1(value);
 
+  LSTATUS status = ERROR_SUCCESS;
   DWORD dwType = multi ? REG_MULTI_SZ : REG_SZ;
-  BYTE lpData[255];
-  DWORD len = 255;
-  LSTATUS status = ::RegQueryValueEx(hkey_, value.c_str(), NULL,
-    &dwType, lpData, &len);
+  DWORD lenNeeded = 0;
+  status = ::RegQueryValueEx(hkey_, value.c_str(), NULL,
+    &dwType, NULL, &lenNeeded);
   switch (status)
   {
   case ERROR_SUCCESS:
@@ -64,7 +64,21 @@ long HKEYWrapper::Query(const std::string & value, std::string & data, bool mult
     throw WindowsAPIError(status, "RegQueryValueEx", value);
   }
 
-  data.assign((LPTSTR)lpData);
+  std::unique_ptr<char[]> buffer(new char[lenNeeded]);
+  status = ::RegQueryValueEx(hkey_, value.c_str(), NULL,
+    &dwType, (LPBYTE)buffer.get(), &lenNeeded);
+  switch (status)
+  {
+  case ERROR_SUCCESS:
+    break;
+  case ERROR_FILE_NOT_FOUND:
+    throw FileNotFoundError("RegQueryValueEx", value);
+  default:
+    throw WindowsAPIError(status, "RegQueryValueEx", value);
+  }
+
+  data.assign(buffer.get());
+  data.erase(data.find_last_not_of("\n") + 1);
   INFO_LOG() << "RegQueryValueEx(" << value << "): " << data;
 
   return status;
@@ -99,12 +113,10 @@ long HKEYWrapper::Set(const std::string & value, const std::string & data, bool 
 {
   TRACE_FUNC1(value);
 
+  LSTATUS status = ERROR_SUCCESS;
   DWORD dwType = multi ? REG_MULTI_SZ : REG_SZ;
-  BYTE lpData[255];
-  DWORD len = 255;
-  ::strncpy_s((char *)lpData, len, data.data(), data.length());
-  LSTATUS status = ::RegSetValueEx(hkey_, value.c_str(), NULL,
-    dwType, lpData, len);
+  status = ::RegSetValueEx(hkey_, value.c_str(), NULL,
+    dwType, (LPBYTE)data.c_str(), data.length() + 1);
   switch (status)
   {
   case ERROR_SUCCESS:
