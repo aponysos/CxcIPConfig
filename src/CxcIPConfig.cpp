@@ -10,7 +10,7 @@ int main(int argc, char **argv)
   InitLog();
 
   MainWindow * window = new MainWindow();
-  window->init();
+  window->Init();
   window->show(argc, argv);
 
   return Fl::run();

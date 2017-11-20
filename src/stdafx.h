@@ -10,6 +10,7 @@
 #include <fstream>
 #include <WinSock2.h>
 #include <iphlpapi.h>
+#include <map>
 
 #include "log4cpp\log4cpp.h"
 
@@ -24,6 +25,7 @@
 #include "FL/Fl_Check_Button.H"
 #pragma warning(pop)
 
+#define RAPIDJSON_HAS_STDSTRING 1
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
