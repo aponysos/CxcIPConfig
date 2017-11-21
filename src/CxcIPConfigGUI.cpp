@@ -118,7 +118,8 @@ void MainWindow::static_choice_interface_Selected(Fl_Widget * w, void * f)
 void MainWindow::choice_interface_Selected(Fl_Widget * /*w*/)
 {
   int index = choice_interface_->value();
-  INFO_LOG() << "choiceInterface index " << index << " selected";
+  INFO_LOG() << "choice_interface_Selected index = " << index;
+
   IPAdapterInfo & info = adptInfos_[index];
   input_ipAddr_->value(info.ipAddr.c_str());
   input_ipMask_->value(info.ipMask.c_str());
@@ -135,7 +136,7 @@ void MainWindow::static_button_save_Clicked(Fl_Widget * w, void * f)
 void MainWindow::button_save_Clicked(Fl_Widget * /*w*/)
 {
   std::string saveName = input_save_->value();
-  INFO_LOG() << "save to name: " << saveName;
+  INFO_LOG() << "button_save_Clicked saveName = " << saveName;
 
   IPAdapterInfo & info = configInfos_[saveName];
   info.ipAddr = input_ipAddr_->value();
@@ -155,7 +156,7 @@ void MainWindow::static_button_load_Clicked(Fl_Widget * w, void * f)
 void MainWindow::button_load_Clicked(Fl_Widget * /*w*/)
 {
   std::string loadName = input_load_->value();
-  INFO_LOG() << "load from name: " << loadName;
+  INFO_LOG() << "button_load_Clicked loadName = " << loadName;
 
   IPAdapterInfo & info = configInfos_[loadName];
   input_ipAddr_->value(info.ipAddr.c_str());
@@ -173,7 +174,8 @@ void MainWindow::static_button_apply_Clicked(Fl_Widget * w, void * f)
 void MainWindow::button_apply_Clicked(Fl_Widget * /*w*/)
 {
   int index = choice_interface_->value();
-  INFO_LOG() << "choiceInterface index " << index << " applied";
+  INFO_LOG() << "button_apply_Clicked index = " << index;
+
   IPAdapterInfo & info = adptInfos_[index];
   info.ipAddr = input_ipAddr_->value();
   info.ipMask = input_ipMask_->value();
