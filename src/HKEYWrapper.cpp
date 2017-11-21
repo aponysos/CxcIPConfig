@@ -156,7 +156,7 @@ long HKEYWrapper::Set(const std::string & value, int data)
   return status;
 }
 
-void GetAdaptorsInfo(std::vector<IPAdapterInfo>& adptInfos)
+void GetAdaptorsInfo(std::vector<IPAdapterInfo> & adptInfos)
 {
   TRACE_FUNC();
 
@@ -224,6 +224,10 @@ void GetAdaptorsInfo(std::vector<IPAdapterInfo>& adptInfos)
 
 void SetAdaptorInfo(const IPAdapterInfo & adptInfo)
 {
+  TRACE_FUNC();
+
+  INFO_LOG() << "SetAdaptorInfo: " << adptInfo;
+
   std::ostringstream oss;
   oss << "SYSTEM\\CurrentControlSet\\services\\Tcpip\\Parameters\\Interfaces\\"
     << adptInfo.name;

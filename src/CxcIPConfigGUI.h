@@ -13,10 +13,6 @@ public:
   void Init();
 
 private:
-  void SaveConfig();
-  void LoadConfig();
-
-private:
   static void static_choice_interface_Selected(Fl_Widget * w, void * f);
   void choice_interface_Selected(Fl_Widget * w);
   static void static_button_save_Clicked(Fl_Widget * w, void * f);
@@ -27,8 +23,7 @@ private:
   void button_apply_Clicked(Fl_Widget * w);
 
 private:
-  std::map<std::string, IPAdapterInfo> configInfos_;
-  std::vector<IPAdapterInfo> adptInfos_;
+  std::unique_ptr<AdapterManager> mgr_;
 
   Fl_Choice * choice_interface_;
   Fl_Input * input_ipAddr_;

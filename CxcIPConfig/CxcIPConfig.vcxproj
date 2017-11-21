@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\CxcIPConfig.cpp" />
     <ClCompile Include="..\src\CxcIPConfigGUI.cpp" />
+    <ClCompile Include="..\src\CxcIPConfigMain.cpp" />
     <ClCompile Include="..\src\HKEYWrapper.cpp" />
     <ClCompile Include="..\src\IphlpApiWrapper.cpp" />
     <ClCompile Include="..\src\stdafx.cpp">
