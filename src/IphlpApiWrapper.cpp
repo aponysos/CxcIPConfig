@@ -16,11 +16,12 @@ void GetAllAdaptors(std::vector<IPAdapterInfo> & adptInfos)
   err = ::GetAdaptersInfo(NULL, &ulOutBufLen);
   if (ERROR_BUFFER_OVERFLOW != err)
     throw WindowsAPIError(err, "GetAdaptersInfo", "probe");
+  INFO_LOG() << "GetAdaptersInfo(probe): ulOutBufLen = " << ulOutBufLen;
 
   size_t nNeeded = ulOutBufLen / sizeof(IP_ADAPTER_INFO);
+  ++nNeeded;
   INFO_LOG() << "GetAdaptersInfo(probe): " << nNeeded << " IP_ADAPTER_INFO needed";
 
-  if (nNeeded <= 1) nNeeded = 2;
   std::unique_ptr<IP_ADAPTER_INFO[]> infos(new IP_ADAPTER_INFO[nNeeded]);
   err = ::GetAdaptersInfo(infos.get(), &ulOutBufLen);
   if (ERROR_SUCCESS != err)
