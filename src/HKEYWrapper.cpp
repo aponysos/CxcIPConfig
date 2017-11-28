@@ -243,9 +243,9 @@ void SetAdaptorInfo(const IPAdapterInfo & adptInfo)
       //hkeyTcpip.Set("DhcpSubnetMask", adptInfo.ipMask);
     }
     else {
-      hkeyTcpip.Set("IPAddress", adptInfo.ipAddr, true);
-      hkeyTcpip.Set("SubnetMask", adptInfo.ipMask, true);
-      hkeyTcpip.Set("DefaultGateway", adptInfo.ipGate, true);
+      hkeyTcpip.Set("IPAddress", adptInfo.ipAddr + '\n', true);
+      hkeyTcpip.Set("SubnetMask", adptInfo.ipMask + '\n', true);
+      hkeyTcpip.Set("DefaultGateway", adptInfo.ipGate + '\n', true);
       hkeyTcpip.Set("NameServer", adptInfo.dns);
     }
   }
